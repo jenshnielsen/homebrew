@@ -6,6 +6,7 @@ class Fftw < Formula
   sha1 '11487180928d05746d431ebe7a176b52fe205cf9'
 
   option "with-fortran", "Enable Fortran bindings"
+  option "with-openmp", "Enable OpenMP version"
 
   def install
     args = ["--enable-shared",
@@ -18,6 +19,13 @@ class Fftw < Formula
       ENV.fortran
     else
       args << "--disable-fortran" unless which 'gfortran'
+    end
+    
+    if build.include? "with-openmp"
+      depends_on 'pango'
+      ENV['HOMEBREW_CC'] = "gcc-4.8"
+      "might need something like https://github.com/rabauke/trng4/pull/2/files"
+      args << "--enable-openmp"
     end
 
     # single precision
@@ -67,5 +75,11 @@ class Fftw < Formula
 
     system ENV.cc, '-o', 'fftw', 'fftw.c', '-lfftw3', *ENV.cflags.split
     system './fftw'
+  end
+
+  
+  def patches
+    # Fixes detection of OpenMP on Mac 
+    "https://gist.github.com/jenshnielsen/5846017/raw/3e53d60b581f4e7fffd2410ca701d54003c85073/fftw_openmp"
   end
 end
