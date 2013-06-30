@@ -7,7 +7,9 @@ class Fftw < Formula
 
   option "with-fortran", "Enable Fortran bindings"
   option "with-openmp", "Enable OpenMP version"
-
+  
+  depends_on 'homebrew/versions/gcc48' if build.include? "with-openmp"
+  
   def install
     args = ["--enable-shared",
             "--disable-debug",
@@ -22,9 +24,7 @@ class Fftw < Formula
     end
     
     if build.include? "with-openmp"
-      depends_on 'pango'
-      ENV['HOMEBREW_CC'] = "gcc-4.8"
-      "might need something like https://github.com/rabauke/trng4/pull/2/files"
+      ENV['HOMEBREW_CC'] = Formula.factory('homebrew/versions/gcc48').opt_prefix/"bin/gcc-4.8"
       args << "--enable-openmp"
     end
 
