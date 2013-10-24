@@ -14,6 +14,17 @@ class CabalInstall < Formula
 
   depends_on 'ghc'
 
+  #Add apple-gcc42 here to stop homebrew from complaining about libc++
+  #which makes no sense since ghc uses gcc.
+  depends_on 'apple-gcc42' if MacOS.version >= :mountain_lion
+  fails_with :clang do
+    cause <<-EOS.undent
+      Building with Clang configures GHC to use Clang as its preprocessor,
+      which causes subsequent GHC-based builds to fail. Thus Cabal depends on
+      gcc.
+      EOS
+  end
+
   conflicts_with 'haskell-platform'
 
   def install
